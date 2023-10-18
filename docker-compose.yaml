@@ -1,0 +1,13 @@
+version: '3'
+services:
+  database:
+    image: 'postgres:latest'
+    restart: unless-stopped
+    ports: 
+      - 5066:5432
+    environment:
+      - POSTGRES_USER=nantoka
+      - POSTGRES_PASSWORD=nantoka
+      - POSTGRES_DB=dbnantoka
+    volumes:
+      - ./psql-data:/var/lib/psql/data 
