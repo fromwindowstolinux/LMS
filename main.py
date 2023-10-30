@@ -1,19 +1,30 @@
 from fastapi import FastAPI, Request, HTTPException, Form
-import typing
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 import psycopg2
 import httpx
 import traceback
+import typing
+from typing import Annotated
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+users = {'testuser@test': 'testuser'}
 
-# isbn form
-@app.get("/test")
-async def show_isbn_form(request: Request):
-    return templates.TemplateResponse("layout.html", {"request": request})
+# login page
+@app.get("/login", response_class=HTMLResponse)
+async def render_login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
 
+@app.post("/login", response_class=HTMLResponse)
+async def check_login(request: Request, email: Annotated[str, Form()], password: Annotated[str, Form()]): 
+    print(email, password) 
+    if email in users and users[email] == password: 
+        return templates.TemplateResponse("layout.html", {"request": request})
+    else:  
+        return templates.TemplateResponse("login.html", {"request": request, "message": "Invalid username or password. Please try again."})
+
+# connect to database
 def connect():
     return psycopg2.connect("dbname=dbnantoka user=nantoka password=nantoka host=127.0.0.1 port=5066")
 
@@ -29,7 +40,7 @@ def existing_book(isbn):
 
 # isbn form
 @app.get("/")
-async def show_isbn_form(request: Request):
+async def render_isbn_form(request: Request):
     return templates.TemplateResponse("isbn_form.html", {"request": request})
 
 # process submitted isbn
