@@ -20,9 +20,21 @@ async def render_login_page(request: Request):
 async def check_login(request: Request, email: Annotated[str, Form()], password: Annotated[str, Form()]): 
     print(email, password) 
     if email in users and users[email] == password: 
-        return templates.TemplateResponse("layout.html", {"request": request})
+        return RedirectResponse("/layout", status_code=302)
     else:  
         return templates.TemplateResponse("login.html", {"request": request, "message": "Invalid username or password. Please try again."})
+
+# layout page
+@app.get("/layout", response_class=HTMLResponse)
+async def render_layout_page(request: Request):
+    return templates.TemplateResponse("layout.html", {"request": request})
+
+# https://fastapi.tiangolo.com/tutorial/security/first-steps/
+
+# sign up page
+@app.get("/signup", response_class=HTMLResponse)
+async def render_sign_up_page(request: Request):
+    return templates.TemplateResponse("signup.html", {"request": request})
 
 # connect to database
 def connect():
@@ -39,7 +51,7 @@ def existing_book(isbn):
                 raise HTTPException(status_code=400, detail="ISBN already exists")
 
 # isbn form
-@app.get("/")
+@app.get("/isbn")
 async def render_isbn_form(request: Request):
     return templates.TemplateResponse("isbn_form.html", {"request": request})
 
@@ -80,7 +92,7 @@ async def new_books(isbn):
         raise HTTPException(status_code=500, detail="Failed to retrieve book details")
 
 # retrieve book details
-@app.post("/")
+@app.post("/isbn")
 async def retrieve_book_details(isbn: typing.Annotated[str, Form()], 
                                 copy_type: typing.Annotated[str, Form()]):
     if not existing_book(isbn):
