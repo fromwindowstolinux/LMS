@@ -32,8 +32,20 @@ pip install httpx
 
 
 ## Run It!
+
+- Start docker, docker compose, and check status
 ```
-docker compose up
+sudo systemctl start docker
+sudo docker compose up
+docker ps 
+```
+- create and check table 
+```
 python3 create_table.py
+psql -d [dbname] -U [username] -h [host] -p [port]
+```
+run the app
+```
 uvicorn main:app --reload
 ```
+
