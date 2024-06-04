@@ -16,7 +16,7 @@ Note: Do this in a Virtual Environment
 ```
 sudo dnf install python-devel postgresql-devel rpm-build
 
-pip install psycopg2
+pip install psycopg2-binary
 ```
 
 4. Backend Framework: 
