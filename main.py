@@ -123,13 +123,26 @@ async def retrieve_book_details(isbn: typing.Annotated[str, Form()],
         raise HTTPException(status_code=400, detail="Book already exists in the database")
 
 @app.get("/book-details")
-async def get_book_details(request: Request):
+async def get_book_details(request: Request, sort_on: str = "title"):
     book_details_list = []
     try:
         with psycopg2.connect("dbname=dbnantoka user=nantoka password=nantoka host=127.0.0.1 port=5066") as conn:
             with conn.cursor() as cur:
                 cur.execute('SELECT isbn, title, authors, copy_type, publisher, publishedDate, description FROM book_details;')
                 book_details_list = cur.fetchall()
+
+    # Sorting logic
+        sort_index = {
+            "isbn": 0,
+            "title": 1,
+            "authors": 2,
+            "copy_type": 3,
+            "publisher": 4,
+            "publishedDate": 5,
+        }.get(sort_on, 0)
+
+        # Sort the list by the specified column index
+        book_details_list.sort(key=lambda x: x[sort_index])
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

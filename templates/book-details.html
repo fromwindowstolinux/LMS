@@ -2,36 +2,38 @@
 
 {% block main %}
 
+
 <div class="p-4 sm:ml-64">
-  <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
-    <h2>Collections</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>ISBN</th>
-          <th>Book Title</th>
-          <th>Author</th>
-          <th>Type</th>
-          <th>Publisher</th>
-          <th>Published Date</th>
-          <th>Synopsis</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for book in book_details_list %}
-        <tr>
-          <td>{{ book[0] }}</td>
-          <td>{{ book[1] }}</td>
-          <td>{{ book[2] }}</td>
-          <td>{{ book[3] }}</td>
-          <td>{{ book[4] }}</td>
-          <td>{{ book[5] }}</td>
-          <td>{{ book[6] }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<div class="p-4 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-900">
+  <h1>Collections</h1>
+  <table class="p-4 w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-900">
+    <thead class="p-4 text-xs text-gray-700 uppercase dark:text-gray-900">
+      <tr>
+        <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-500">ISBN</th>
+        <th scope="col" class="px-6 py-3">Book Title</th>
+        <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-500">Author</th>
+        <th scope="col" class="px-6 py-3">Type</th>
+        <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-500">Publisher</th>
+        <th scope="col" class="px-6 py-3">Published Year</th>
+        <!-- <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-500">Synopsis</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in book_details_list %}
+      <tr class="border-b border-gray-200 dark:border-gray-900">
+        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-500">{{ book[0] }}</td>
+        <td class="px-6 py-4">{{ book[1] }}</td>
+        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-500">{{ book[2] }}</td>
+        <td class="px-6 py-4">{{ book[3] }}</td>
+        <td class="px-6 py-4 bg-gray-50 dark:bg-gray-500 whitespace-nowrap">{{
+          book[4] }}</td>
+        <td class="px-6 py-4">{{ book[5] }}</td>
+        <!-- <td class="px-6 py-6 bg-gray-50 dark:bg-gray-500">{{ book[6] }}</td> -->
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 </div>
 
 {% endblock %}
