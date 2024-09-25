@@ -75,11 +75,16 @@ async def new_books(isbn):
                 data = response.json()
                 if "items" in data:
                     book = data["items"][0]["volumeInfo"]
+                    authors = book.get("authors", [])
+                    authors_cleaned = ", ".join(authors)
+                    published_date = book.get("publishedDate", "")
+                    published_year = published_date[:4] if published_date else ""
+                    # clean authors here
                     return {
                         "title": book.get("title", ""),
-                        "authors": book.get("authors", []),
+                        "authors": authors_cleaned,
                         "publisher": book.get("publisher", ""),
-                        "publishedDate": book.get("publishedDate", ""),
+                        "publishedDate": published_year,
                         "description": book.get("description", "")
                     }
                 else:
@@ -118,12 +123,12 @@ async def retrieve_book_details(isbn: typing.Annotated[str, Form()],
             traceback.print_exc()
             raise HTTPException(status_code=500, detail="Failed to insert book details into the database")
         return {"message": "Book details inserted successfully"}
-    
+        
     else:
         raise HTTPException(status_code=400, detail="Book already exists in the database")
 
 @app.get("/book-details")
-async def get_book_details(request: Request, sort_on: str = "title"):
+async def get_book_details(request: Request, sort_on: str = "authors"):
     book_details_list = []
     try:
         with psycopg2.connect("dbname=dbnantoka user=nantoka password=nantoka host=127.0.0.1 port=5066") as conn:
@@ -148,6 +153,132 @@ async def get_book_details(request: Request, sort_on: str = "title"):
         raise HTTPException(status_code=500, detail=str(e))
 
     return templates.TemplateResponse("book-details.html", {"request": request, "book_details_list": book_details_list})
+
+
+# Retrieve a specific book's details by ISBN
+@app.get("/book-info/{isbn}", response_class=HTMLResponse)
+async def render_book_info(request: Request, isbn: str):
+    print(f"Fetching book info for ISBN: {isbn}")  # Debugging statement
+    try:
+        with connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    '''SELECT isbn, title, authors, publisher, publishedDate, description 
+                       FROM book_details WHERE isbn = %s;''', (isbn,)
+                )
+                book_details = cur.fetchone()
+                print(f"Book details fetched: {book_details}")  # Debugging statement
+
+                if not book_details:
+                    print("Book not found in database")  # Debugging statement
+                    raise HTTPException(status_code=404, detail="Book not found")
+
+                return templates.TemplateResponse("book-info.html", {
+                    "request": request,
+                    "isbn": book_details[0],
+                    "title": book_details[1],
+                    "authors": book_details[2],
+                    "publisher": book_details[3],
+                    "publishedDate": book_details[4],
+                    "description": book_details[5]
+                })
+    except Exception as e:
+        print(f"Error occurred: {e}")  # Debugging statement
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Edit a book's details (GET request to render the edit form)
+@app.get("/edit-book/{isbn}", response_class=HTMLResponse)
+async def render_edit_book_form(request: Request, isbn: str):
+    try:
+        with connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    '''SELECT isbn, title, authors, publisher, publishedDate, description, copy_type 
+                       FROM book_details WHERE isbn = %s;''', (isbn,)
+                )
+                book_details = cur.fetchone()
+
+                if not book_details:
+                    raise HTTPException(status_code=404, detail="Book not found")
+
+                return templates.TemplateResponse("edit-book.html", {
+                    "request": request,
+                    "isbn": book_details[0],
+                    "title": book_details[1],
+                    "authors": book_details[2],
+                    "publisher": book_details[3],
+                    "published_date": book_details[4],
+                    "description": book_details[5],
+                    "copy_type": book_details[6]
+                })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Edit a book's details (POST request to submit the updated form)
+@app.get("/book-info/{isbn}", response_class=HTMLResponse)
+async def render_book_info(request: Request, isbn: str):
+    try:
+        with connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    '''SELECT isbn, title, authors, type, publisher, publishedDate, description, image_url 
+                       FROM book_details WHERE isbn = %s;''', (isbn,)
+                )
+                book_details = cur.fetchone()
+
+                if not book_details:
+                    raise HTTPException(status_code=404, detail="Book not found")
+
+                return templates.TemplateResponse("book-info.html", {
+                    "request": request,
+                    "isbn": book_details[0],
+                    "title": book_details[1],
+                    "authors": book_details[2],
+                    "publisher": book_details[4],
+                    "published_date": book_details[5],
+                    "description": book_details[6],
+                    "url": book_details[7]  # Pass the image URL to the template
+                })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@app.post("/update-book/{isbn}")
+async def update_book(isbn: str, request: Request):
+    form_data = await request.form()
+
+    title = form_data['title']
+    authors = form_data['authors']
+    publisher = form_data['publisher']
+    published_year = form_data['published_year']
+    copy_type = form_data['copy_type']
+    description = form_data['description']
+
+    try:
+        with connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute('''UPDATE book_details 
+                               SET  title = %s, 
+                                    authors = %s, 
+                                    publisher = %s, 
+                                    publishedDate = %s, 
+                                    copy_type = %s, 
+                                    description = %s 
+                               WHERE isbn = %s;''',
+                            (title, authors, publisher, published_year, copy_type, description, isbn))
+
+                conn.commit()
+
+        # Redirect to updated book info page
+        return RedirectResponse(url=f"/book-info/{isbn}", status_code=303)
+    except Exception as e:
+        print(f"Error occurred while updating book: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 
 if __name__ == "__main__":
     import uvicorn
