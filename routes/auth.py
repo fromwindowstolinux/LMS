@@ -48,32 +48,3 @@ async def render_layout_page(request: Request, is_authenticated: bool = Depends(
         return RedirectResponse(url="/login", status_code=HTTP_302_FOUND)  # Redirect to login if not logged in
     print(f"User is authenticated. Rendering layout page.")
     return templates.TemplateResponse("isbn_form.html", {"request": request})
-
-# Get list of book details
-# @auth_router.get("/book-details", response_class=HTMLResponse)
-# async def get_book_details(request: Request, sort_on: str = "authors", is_authenticated: bool = Depends(get_current_user)):
-#     if not is_authenticated:
-#         return RedirectResponse(url="/login", status_code=HTTP_302_FOUND)
-    
-#     book_details_list = []
-#     try:
-#         with connect() as conn:
-#             with conn.cursor() as cur:
-#                 cur.execute('SELECT isbn, title, authors, copy_type, publisher, publishedDate, description FROM book_details;')
-#                 book_details_list = cur.fetchall()
-
-#         sort_index = {
-#             "isbn": 0,
-#             "title": 1,
-#             "authors": 2,
-#             "copy_type": 3,
-#             "publisher": 4,
-#             "publishedDate": 5,
-#         }.get(sort_on, 0)
-
-#         book_details_list.sort(key=lambda x: x[sort_index])
-
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
-
-#     return templates.TemplateResponse("book-details.html", {"request": request, "book_details_list": book_details_list})
