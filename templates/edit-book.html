@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Book - {{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-gray-50 dark:bg-gray-800 text-white py-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-semibold"><a href="/book-details">Home</a></h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto mt-6">
+        <section class="bg-white p-6 rounded-lg shadow-lg">
+            <h1 class="text-3xl font-bold mb-6">Edit Book: {{ title }}</h1>
+            <form method="POST" action="/update-book/{{ isbn }}">
+                <div class="grid gap-6 mb-6 lg:grid-cols-2">
+                    <!-- ISBN Field (Read Only) -->
+                    <div>
+                        <label for="isbn" class="block mb-2 text-sm font-medium text-gray-900">ISBN</label>
+                        <input type="text" id="isbn" name="isbn" value="{{ isbn }}"
+                            class="bg-gray-200 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
+                            readonly>
+                    </div>
+
+                    <!-- Book Title Field -->
+                    <div>
+                        <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Title</label>
+                        <input type="text" id="title" name="title" value="{{ title }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5">
+                    </div>
+
+                    <!-- Authors Field -->
+                    <div>
+                        <label for="authors" class="block mb-2 text-sm font-medium text-gray-900">Authors</label>
+                        <input type="text" id="authors" name="authors" value="{{ authors }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5">
+                    </div>
+
+                    <!-- Publisher Field -->
+                    <div>
+                        <label for="publisher" class="block mb-2 text-sm font-medium text-gray-900">Publisher</label>
+                        <input type="text" id="publisher" name="publisher" value="{{ publisher }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5">
+                    </div>
+
+                    <!-- Published Year Field (Editable) -->
+                    <div>
+                        <label for="published_year" class="block mb-2 text-sm font-medium text-gray-900">Published
+                            Year</label>
+                        <input type="number" id="published_year" name="published_year" value="{{ published_date }}"
+                            min="1900" max="2100" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5">
+                    </div>
+
+                    <!-- Image URL -->
+                    <div>
+                        <label for="url" class="block mb-2 text-sm font-medium text-gray-900">Image URL</label>
+                        <input type="text" id="url" name="url" value="{{ url }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5">
+                    </div>
+
+
+                    <!-- Copy Type Field -->
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900">Copy Type</label>
+                        <div class="flex items-center">
+                            <input type="radio" id="hardcopy" name="copy_type" value="Hardcopy" {% if
+                                copy_type=='Hardcopy' %}checked{% endif %} class="mr-2">
+                            <label for="hardcopy" class="mr-4">Hardcopy</label>
+                            <input type="radio" id="softcopy" name="copy_type" value="Softcopy" {% if
+                                copy_type=='Softcopy' %}checked{% endif %} class="mr-2">
+                            <label for="softcopy">Softcopy</label>
+                        </div>
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="lg:col-span-2">
+                        <label for="description"
+                            class="block mb-2 text-sm font-medium text-gray-900">Description</label>
+                        <textarea id="description" name="description" rows="4" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5">{{ description }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                    class="w-full text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                    Update Book
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; Library Management System</p>
+        </div>
+    </footer>
+</body>
+
+</html>
