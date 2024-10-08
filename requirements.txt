@@ -1,0 +1,4 @@
+fastapi[all]
+uvicorn[standard]
+httpx
+psycopg2-binary
