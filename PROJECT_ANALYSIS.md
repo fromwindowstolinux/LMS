@@ -11,6 +11,12 @@ This document provides a detailed analysis of the repository's stack and feature
 *   **Template Engine:** Jinja2 (Server-side rendering)
 *   **HTTP Client:** `httpx` (Async client for external API calls)
 
+### Frontend
+*   **Structure:** Server-side rendered HTML templates using Jinja2 inheritance (`layout.html` as base).
+*   **Styling:** **Tailwind CSS** (Loaded via CDN).
+*   **Icons:** Inline SVGs (Tabler Icons).
+*   **JavaScript:** Minimal vanilla JavaScript (mostly inline, e.g., confirmation dialogs). No heavy frontend framework (React/Vue) or build step.
+
 ### Database
 *   **Database:** PostgreSQL
 *   **Driver:** `psycopg2-binary`
@@ -54,6 +60,7 @@ The core functionality revolves around managing a collection of books.
     *   **Sorting:** Sorts by **Author's Family Name** (Logic implemented in Python, not SQL).
     *   **Pagination:** Supports `limit` and `offset` (Logic applied in Python after fetching/sorting).
     *   **Display:** Shows formatted author names ("Family Name, Given Name").
+    *   **UI:** Table view with columns for ISBN, Title, Author, Type, Publisher, Year, and Actions.
 
 #### 3. View Book Details
 *   **Endpoint:** `GET /book-info/{isbn}`
@@ -66,6 +73,7 @@ The core functionality revolves around managing a collection of books.
 #### 5. Delete Book
 *   **Endpoint:** `POST /delete-book/{isbn}`
 *   **Logic:** Removes the record from the database.
+*   **UI:** Includes a client-side confirmation dialog ("Are you sure...?").
 
 ## 3. Database Schema
 
@@ -93,4 +101,5 @@ The core functionality revolves around managing a collection of books.
     *   Use `isbn` as Primary Key or ensure unique constraint.
     *   Consider using an ORM (SQLAlchemy/SQLModel) instead of raw SQL strings.
 *   **Performance:** Move sorting and pagination logic to the SQL query (`ORDER BY`, `LIMIT`, `OFFSET`) to handle large datasets efficiently.
+*   **Frontend:** The current sidebar toggle (`data-drawer-target`) appears to rely on a JS library (like Flowbite) that is missing from the imports. Ensure the new frontend includes necessary scripts or implements this logic.
 *   **Data Integrity:** The `existing_book` check function has a logic flow issue (raises exception instead of returning boolean), which makes the conditional check in `routes/book.py` redundant/buggy.
